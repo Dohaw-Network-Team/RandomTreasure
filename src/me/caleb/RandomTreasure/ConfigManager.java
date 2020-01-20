@@ -8,8 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import me.caleb.UtilsAPI.utils.Chat;
-
 public class ConfigManager {
 
 	public static Main plugin = Main.getMain();
