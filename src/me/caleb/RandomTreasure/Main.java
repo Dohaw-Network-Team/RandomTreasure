@@ -14,7 +14,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.EditSession;
@@ -22,7 +21,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -36,8 +34,6 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -47,9 +43,16 @@ public class Main extends JavaPlugin{
 	
 	public void onEnable() {
 		instance = this;
-		this.saveResource("config.yml", false);
 		
-		if(this.getConfig().getStringList("Structures").isEmpty()) {
+		File[] files = {new File(this.getDataFolder(), "config.yml")};
+		
+		for(File f : files) {
+			if(!f.exists()) {
+				this.saveResource(f.getName(), true);
+			}
+		}
+		
+		if(ConfigManager.getTreasureShrineLocs().isEmpty()) {
 			generateStructures();
 		}else {
 			takeDownStructures();
@@ -70,14 +73,28 @@ public class Main extends JavaPlugin{
 		Bukkit.getLogger().fine("Generating shrines...");
 		ArrayList<Location> shrines = new ArrayList<Location>();
 		
-		World w = ConfigManager.getWorld();
-		Location spawnLoc = w.getSpawnLocation();
+		World w;
+		
+		try {
+			w = ConfigManager.getWorld();
+		}catch(NullPointerException e) {
+			Bukkit.getLogger().severe("Cannot generate Shrines. Please fix the world field in the config!");
+			return;
+		}
+		
+		Location spawnLoc;
+		try {
+			spawnLoc = w.getSpawnLocation();
+		}catch(NullPointerException e) {
+			Bukkit.getLogger().severe("The config field World is not set properly! Cannot generate Treasure Shrines!");
+			return;
+		}
+		
 		Location startLoc = new Location(w, getRandX(), 100, getRandZ());
 		startLoc = adjustShrine(startLoc);
 		shrines.add(startLoc);
 		
-		for(int x = 1; x <= 10; x++) {
-			int index = shrines.size()-1;
+		for(int x = 1; x <= ConfigManager.getNumShrines(); x++) {
 			Location newShrine = new Location(w, getRandX(), 100, getRandZ());
 			
 			if(shrines.size() != 1) {
@@ -99,7 +116,7 @@ public class Main extends JavaPlugin{
 				e.printStackTrace();
 			}
 			shrines.add(newShrine);
-			ConfigManager.addShrine(newShrine);
+			ConfigManager.addShrine(newShrine,x);
 		}
 		
 	}
@@ -107,12 +124,11 @@ public class Main extends JavaPlugin{
 	public void takeDownStructures() {
 		
 		Bukkit.getConsoleSender().sendMessage("Taking down shrines...");
-		List<String> shrines = ConfigManager.getStructures();
-		this.getConfig().set("Structures", new ArrayList<String>());
-		this.saveConfig();
+		List<String> shrines = ConfigManager.getTreasureShrineLocs();
 		
 		int counter = 1;
 		double x,y,z;
+		
 		World w = ConfigManager.getWorld();
 		
 		for(String line : shrines) {
@@ -132,6 +148,9 @@ public class Main extends JavaPlugin{
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
+				} catch(NullPointerException e) {
+					Bukkit.getLogger().severe("Cannot generate Shrines. Please fix the world field in the config!");
+					return;
 				}
 			}
 
@@ -184,8 +203,6 @@ public class Main extends JavaPlugin{
 		
 		Location startLoc = loc;
 		
-		WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-		
 		Location s1Loc = new Location(w, (startLoc.getX() - 6), startLoc.getY(), (startLoc.getZ() + 5));
 		Location s2Loc = new Location(w, (startLoc.getX() + 7), (startLoc.getY() + 6), (startLoc.getZ() - 8));
 		
@@ -230,7 +247,6 @@ public class Main extends JavaPlugin{
 		try {
 			schemFile.createNewFile();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

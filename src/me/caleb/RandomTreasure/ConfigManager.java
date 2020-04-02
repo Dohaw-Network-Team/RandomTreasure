@@ -15,32 +15,21 @@ public class ConfigManager {
 	public static FileConfiguration config = plugin.getConfig();
 	
 	public static World getWorld() {
-		try {
-			if(Bukkit.getWorld(config.getString("World")) != null) {
-				return Bukkit.getWorld(config.getString("World"));
-			}
-		}catch(IllegalArgumentException e) {
-			Bukkit.getLogger().severe("The config field World is not set properly! Cannot generate Treasure Shrines!");
-			plugin.getPluginLoader().disablePlugin(plugin);
+		if(Bukkit.getWorlds().contains(Bukkit.getWorld("World"))) {
+			return Bukkit.getWorld(config.getString("World"));
+		}else {
+			return null;
 		}
-
-		return null;
 	}
 	
-	public static void addShrine(Location loc) {
-		
-		List<String> shrines;
-		
-		if(config.getStringList("Structures").isEmpty()) {
-			shrines = new ArrayList<String>();
-		}else {
-			shrines = config.getStringList("Structures");
-		}
-		
-		shrines.add("X:" + loc.getX() + " Y:" + loc.getY() + " Z:" + loc.getZ());
-		
-		config.set("Structures", shrines);
+	public static void addShrine(Location loc, int num) {
+		config.set("FirstShrines.Shrine" + num + ".Location", "X:" + loc.getX() + " Y:" + loc.getY() + " Z:" + loc.getZ());
+		config.set("FirstShrines.Shrine" + num + ".ConqueredBy", "none");
 		plugin.saveConfig();
+	}
+	
+	public static int getNumShrines() {
+		return config.getInt("NumShrines");
 	}
 	
 	public static double getMinBound() {
@@ -51,8 +40,14 @@ public class ConfigManager {
 		return Double.parseDouble(config.getString("MaxBound"));
 	}
 	
-	public static List<String> getStructures(){
-		return config.getStringList("Structures");
+	public static List<String> getTreasureShrineLocs() {
+		List<String> shrines = new ArrayList<String>();
+		
+		for(int x = 1; x <= getNumShrines(); x++) {
+			shrines.add(config.getString("FirstShrines.Shrine" + x + ".Location"));
+		}
+		
+		return shrines;
 	}
 	
 }

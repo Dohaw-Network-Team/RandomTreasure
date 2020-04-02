@@ -1,4 +1,6 @@
 World:
-Structures: {}
 MinBound: 500
 MaxBound: 1500
+NumShrines: 10
+#What clan has conquered these shrines thus far
+FirstShrines:
