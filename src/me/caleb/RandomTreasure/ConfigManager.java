@@ -40,12 +40,19 @@ public class ConfigManager {
 		return Double.parseDouble(config.getString("MaxBound"));
 	}
 	
-	public static List<String> getTreasureShrineLocs() {
-		List<String> shrines = new ArrayList<String>();
+	public static List<Location> getTreasureShrineLocs() {
+		List<Location> shrines = new ArrayList<Location>();
+		LocationSerializer ls = new LocationSerializer(plugin.getConfig());
 		
-		for(int x = 1; x <= getNumShrines(); x++) {
-			shrines.add(config.getString("FirstShrines.Shrine" + x + ".Location"));
+		try {
+			for(int x = 1; x <= getNumShrines(); x++) {
+				shrines.add(ls.toLocation(config.getString("FirstShrines.Shrine" + x + ".Location")));
+				
+			}
+		}catch(NullPointerException e) {
+			return new ArrayList<Location>();
 		}
+		
 		
 		return shrines;
 	}

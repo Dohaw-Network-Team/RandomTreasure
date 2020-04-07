@@ -115,8 +115,17 @@ public class Main extends JavaPlugin{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			LocationSerializer ls = new LocationSerializer(this.getConfig());
+			ls.storeLocation("FirstShrines." + "Shrine" + x + ".Location", newShrine);
+			
+			this.getConfig().set("FirstShrines." + "Shrine" + x + ".ConqueredBy", "none");
+			
+			this.saveConfig();
+			
+			
+			
 			shrines.add(newShrine);
-			ConfigManager.addShrine(newShrine,x);
 		}
 		
 	}
@@ -124,19 +133,19 @@ public class Main extends JavaPlugin{
 	public void takeDownStructures() {
 		
 		Bukkit.getConsoleSender().sendMessage("Taking down shrines...");
-		List<String> shrines = ConfigManager.getTreasureShrineLocs();
+		List<Location> shrines = ConfigManager.getTreasureShrineLocs();
 		
 		int counter = 1;
 		double x,y,z;
 		
 		World w = ConfigManager.getWorld();
 		
-		for(String line : shrines) {
+		for(Location loc : shrines) {
 			
-			String[] arrLine = line.split(" ");
-			z = (getLineZ(arrLine)-8);
-			x = (getLineX(arrLine)-6);
-			y = getLineY(arrLine);
+			z = loc.getZ() - 8;
+			x = loc.getX() - 6;
+			y = loc.getY();
+			
 			Location shrine = new Location(ConfigManager.getWorld(),x, y, z);
 			
 			if(counter == 11) {
