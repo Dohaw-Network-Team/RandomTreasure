@@ -59,10 +59,12 @@ public class Main extends JavaPlugin{
 			generateStructures();
 		}
 		
+		new ShrineManager(this);
+		
 	}
 	
 	public void onDisable() {
-		
+		Bukkit.getScheduler().cancelTasks(this);
 	}
 	
 	public static Main getMain() {
@@ -116,15 +118,7 @@ public class Main extends JavaPlugin{
 				e.printStackTrace();
 			}
 			
-			LocationSerializer ls = new LocationSerializer(this.getConfig());
-			ls.storeLocation("FirstShrines." + "Shrine" + x + ".Location", newShrine);
-			
-			this.getConfig().set("FirstShrines." + "Shrine" + x + ".ConqueredBy", "none");
-			
-			this.saveConfig();
-			
-			
-			
+			ConfigManager.addShrine(newShrine, x);
 			shrines.add(newShrine);
 		}
 		

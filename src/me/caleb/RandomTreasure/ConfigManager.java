@@ -23,8 +23,11 @@ public class ConfigManager {
 	}
 	
 	public static void addShrine(Location loc, int num) {
-		config.set("FirstShrines.Shrine" + num + ".Location", "X:" + loc.getX() + " Y:" + loc.getY() + " Z:" + loc.getZ());
-		config.set("FirstShrines.Shrine" + num + ".ConqueredBy", "none");
+		LocationSerializer ls = new LocationSerializer(plugin.getConfig());
+		ls.storeLocation("FirstShrines." + "Shrine" + num + ".Location", loc);
+		
+		plugin.getConfig().set("FirstShrines." + "Shrine" + num + ".ConqueredBy", "none");
+		plugin.getConfig().set("FirstShrines." + "Shrine" + num + ".BeingConquered", false);
 		plugin.saveConfig();
 	}
 	
@@ -38,6 +41,19 @@ public class ConfigManager {
 	
 	public static double getMaxBound() {
 		return Double.parseDouble(config.getString("MaxBound"));
+	}
+	
+	public static void setBeingConquered(int num) {
+		config.set("FirstShrines.Shrine" + num + ".BeingConquered", true);
+		plugin.saveConfig();
+	}
+	
+	public static boolean isBeingConquered(int num) {
+		return config.getBoolean("FirstShrines.Shrine" + num + ".BeingConquered");
+	}
+	
+	public static String getConquerer(int num) {
+		return config.getString("FirstShrines.Shrine" + num + ".ConqueredBy");
 	}
 	
 	public static List<Location> getTreasureShrineLocs() {
