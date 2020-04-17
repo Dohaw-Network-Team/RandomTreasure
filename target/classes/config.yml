@@ -1,8 +1,0 @@
-World:
-MinBound: 500
-MaxBound: 1500
-NumShrines: 10
-Prefix: '&l[&6&lShrines&r&l]'
-HoldTime: 0.5
-#What clan has conquered these shrines thus far
-FirstShrines:
